@@ -100,6 +100,13 @@ getInstanceName() {
     echo "$name"
 }
 
+
+echo ""
+echo "This utility will guide you on installing and configuring the monitoring tools."
+echo "Please make sure to have another shell accessible as you'll be required to input command"
+echo ""
+waitForNextStep "ZeroMQ - Installation"
+
 # ZeroMQ
 installZMQ
 waitForNextStep "Apache2 - LogFormat"
