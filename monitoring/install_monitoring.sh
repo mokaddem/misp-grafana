@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -e
+
 Color_Off='\033[0m'       # Text Reset
 BCyan='\033[1;36m'        # Bold Cyan
 BGreen='\033[1;32m'       # Bold Green
@@ -9,13 +11,11 @@ DBPASSWORD_MONITORING_USER="$(openssl rand -hex 32)"
 installZMQ() {
     echoProgress "MISP ZeroMQ" "installing" "Installing MISP ZMQ python requirements"
     cd ../src/
-    python3 -m venv venv
-    source venv/bin/activate
-    pip install -r requirements.txt
+    python3 -m venv venv && source venv/bin/activate && pip install -r requirements.txt
 }
 
 changeLogFormat() {
-    echo "Make sure the `combined` log entry is set to the following:"
+    echo "Make sure the \`combined\` log entry is set to the following:"
     echo ''
     echo 'Configuration file should be located here:'
     echo '/etc/apache2/apache2.conf'
@@ -88,6 +88,7 @@ getInstanceName() {
 
 # ZeroMQ
 installZMQ
+waitForNextStep
 
 # Apache2
 changeLogFormat
