@@ -6,27 +6,6 @@ BGreen='\033[1;32m'       # Bold Green
 
 DBPASSWORD_MONITORING_USER="$(openssl rand -hex 32)"
 
-# ZeroMQ
-installZMQ
-
-# Apache2
-changeLogFormat
-waitForNextStep
-
-# MySQL
-enableMySQLPerfMonitoring
-waitForNextStep
-createMonitoringUser
-
-# Telgraf
-## Generate telegraf configuration
-genTelegrafConfig
-waitForNextStep
-
-## Install telegraf
-installTelegraf
-waitForNextStep
-
 installZMQ() {
     echoProgress "MISP ZeroMQ" "installing" "Installing MISP ZMQ python requirements"
     cd ../src/
@@ -106,3 +85,24 @@ getInstanceName() {
     read -p "Enter the name of the instance: " name
     echo "$name"
 }
+
+# ZeroMQ
+installZMQ
+
+# Apache2
+changeLogFormat
+waitForNextStep
+
+# MySQL
+enableMySQLPerfMonitoring
+waitForNextStep
+createMonitoringUser
+
+# Telgraf
+## Generate telegraf configuration
+genTelegrafConfig
+waitForNextStep
+
+## Install telegraf
+installTelegraf
+waitForNextStep
