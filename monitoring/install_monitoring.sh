@@ -67,7 +67,7 @@ installTelegraf() {
 
 genTelegrafConfig() {
     echoProgress "Telegraf" "configuring" "Configuring Telegraf config"
-    local name=$(get_name)
+    local name=$(getInstanceName)
     sed "s/{{\s*instance_name\s*}}/$name/g" telegraf.conf.template > telegraf.conf
     sed "s/{{\s*db_password_monitoring_user\s*}}/$DBPASSWORD_MONITORING_USER/g" telegraf.conf.template > telegraf.conf
     echoProgress "Telegraf" "done" "\n"
@@ -103,7 +103,7 @@ getInstanceName() {
 
 echo ""
 echo "This utility will guide you on installing and configuring the monitoring tools."
-echo "Please make sure to have another shell accessible as you'll be required to input command"
+echo "Please make sure to have another shell accessible as you'll be required to paste some commands"
 echo ""
 waitForNextStep "ZeroMQ - Installation"
 
