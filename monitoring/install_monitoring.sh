@@ -5,6 +5,7 @@ set -e
 Color_Off='\033[0m'       # Text Reset
 BCyan='\033[1;36m'        # Bold Cyan
 BGreen='\033[1;32m'       # Bold Green
+BYellow='\033[1;33m'       # Bold Yellow
 
 DBPASSWORD_MONITORING_USER="$(openssl rand -hex 32)"
 
@@ -73,6 +74,9 @@ genTelegrafConfig() {
 }
 
 waitForNextStep() {
+    local message="$1"
+    echo -e " >> Next step: $BYellow$message$Color_Off"
+
     while true; do
         read -p "Do you want to continue? (y): " y
         case $y in
@@ -98,22 +102,23 @@ getInstanceName() {
 
 # ZeroMQ
 installZMQ
-waitForNextStep
+waitForNextStep "Apache2 - LogFormat"
 
 # Apache2
 changeLogFormat
-waitForNextStep
+waitForNextStep "MySQL - Performance Schema"
 
 # MySQL
 enableMySQLPerfMonitoring
-waitForNextStep
+waitForNextStep "MySQL - Monitoring User"
 createMonitoringUser
+waitForNextStep "Telegraf - Configuration"
 
 # Telgraf
 ## Generate telegraf configuration
 genTelegrafConfig
-waitForNextStep
+waitForNextStep "Telegraf - Installation"
 
 ## Install telegraf
 installTelegraf
-waitForNextStep
+echoProgress "Installation" "done" "\n"
