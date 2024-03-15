@@ -1,0 +1,146 @@
+[global_tags]
+  instance = "{{instance_name}}"
+
+ [[outputs.influxdb_v2]]
+  ## The URLs of the InfluxDB cluster nodes.
+  ##
+  ## Multiple URLs can be specified for a single cluster, only ONE of the
+  ## urls will be written to each interval.
+  ##   ex: urls = ["https://us-west-2-1.aws.cloud2.influxdata.com"]
+  urls = ["http://10.64.247.92:8086"]
+
+  ## API token for authentication.
+  token = "lal2maMv7osN8jGT87BlhcmJJVHBZMC7U0fOcw7kCDTxI70qNm96i2fURK_iwMXtBXwXLgnxteTehu3qX4Emww=="
+
+  ## Organization is the name of the organization you wish to write to; must exist.
+  organization = "misp-project"
+
+  ## Destination bucket to write into.
+  bucket = "misp-training"
+
+# for debugging
+#[[outputs.file]]
+#  files = ["stdout"]
+#  data_format = "influx"
+
+
+[[inputs.tail]]
+  files = ["/var/log/apache2/training.local_access.log"]
+  name_override = "misp_apache_access_log"
+  data_format = "grok"
+  grok_patterns = ["%{COMBINED_LOG_FORMAT} %{POSINT:response_time:int}"]
+
+[[inputs.tail]]
+  files = ["/var/www/MISP/app/tmp/logs/error.log"]
+  name_override = "misp_error_log"
+  data_format = "grok"
+  grok_patterns = ["%{MISP_ERROR_LOG}"]
+  grok_custom_patterns = '''
+MISP_ERROR_LOG_DATE %{YEAR}-%{MONTHNUM}-%{MONTHDAY} %{HOUR}:%{MINUTE}:%{SECOND}
+MISP_ERROR_LOG %{MISP_ERROR_LOG_DATE:date} %{WORD:log_entry_type:tag}: %{GREEDYDATA:log_entry_text}
+  '''
+
+# Read metrics about cpu usage
+[[inputs.cpu]]
+  ## Whether to report per-cpu stats or not
+  percpu = true
+  ## Whether to report total system cpu stats or not
+  totalcpu = true
+  ## Comment this line if you want the raw CPU time metrics
+  fielddrop = ["time_*"]
+
+# Read metrics about disk usage by mount point
+[[inputs.disk]]
+  ## By default, telegraf gather stats for all mountpoints.
+  ## Setting mountpoints will restrict the stats to the specified mountpoints.
+  # mount_points = ["/"]
+  ## Ignore some mountpoints by filesystem type. For example (dev)tmpfs (usually
+  ## present on /run, /var/run, /dev/shm or /dev).
+  ignore_fs = ["tmpfs", "devtmpfs"]
+
+# Read metrics about disk IO by device
+[[inputs.diskio]]
+  ## By default, telegraf will gather stats for all devices including
+  ## Setting devices will restrict the stats to the specified devices.
+  # devices = ["sda", "sdb"]
+
+# Get kernel statistics from /proc/stat
+[[inputs.kernel]]
+  # no configuration
+
+# Read metrics about memory usage
+[[inputs.mem]]
+  # no configuration
+
+# Get the number of processes and group them by status
+[[inputs.processes]]
+  # no configuration
+
+# Read metrics about swap memory usage
+[[inputs.swap]]
+  # no configuration
+
+# Read metrics about system load & uptime
+[[inputs.system]]
+  # no configuration
+
+# Read metrics about network interface usage
+[[inputs.net]]
+  # collect data only about specific interfaces
+  # interfaces = ["eth0"]
+
+[[inputs.netstat]]
+  # no configuration
+[[inputs.interrupts]]
+  # no configuration
+[[inputs.linux_sysctl_fs]]
+  # no configuration
+
+
+# Read metrics from one or many mysql servers
+[[inputs.mysql]]
+  ## specify servers via a url matching:
+  ##  [username[:password]@][protocol[(address)]]/[?tls=[true|false|skip-verify|custom]]
+  ##  e.g.
+  ##    servers = ["user:passwd@tcp(127.0.0.1:3306)/?tls=false"]
+  ##    servers = ["user@tcp(127.0.0.1:3306)/?tls=false"]
+  servers = ["monitoring:{{db_password_monitoring_user}}@tcp(localhost:3306)/"]
+
+  metric_version = 2
+
+  ## if the list is empty, then metrics are gathered from all database tables
+  table_schema_databases = ["misp"]
+
+  ## gather metrics from INFORMATION_SCHEMA.TABLES for databases provided
+  ## in the list above
+  gather_table_schema = true
+
+  ## gather thread state counts from INFORMATION_SCHEMA.PROCESSLIST
+  gather_process_list = true
+
+  ## gather auto_increment columns and max values from information schema
+  gather_info_schema_auto_inc = true
+
+  ## gather metrics from INFORMATION_SCHEMA.INNODB_METRICS
+  gather_innodb_metrics = true
+
+  ## use SHOW ALL SLAVES STATUS command output for MariaDB
+  mariadb_dialect = true
+
+  ## gather metrics from PERFORMANCE_SCHEMA.TABLE_IO_WAITS_SUMMARY_BY_TABLE
+  gather_table_io_waits = true
+
+  ## gather metrics from PERFORMANCE_SCHEMA.TABLE_LOCK_WAITS
+  gather_table_lock_waits = true
+
+  ## gather metrics from PERFORMANCE_SCHEMA.TABLE_IO_WAITS_SUMMARY_BY_INDEX_USAGE
+  gather_index_io_waits = true
+
+  ## gather metrics from PERFORMANCE_SCHEMA.EVENT_WAITS
+  gather_event_waits = true
+
+  ## gather metrics from PERFORMANCE_SCHEMA.FILE_SUMMARY_BY_EVENT_NAME
+  gather_file_events_stats = true
+
+  ## gather metrics from PERFORMANCE_SCHEMA.EVENTS_STATEMENTS_SUMMARY_BY_DIGEST
+  gather_perf_events_statements             = true
