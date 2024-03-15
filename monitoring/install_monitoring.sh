@@ -11,17 +11,23 @@ DBPASSWORD_MONITORING_USER="$(openssl rand -hex 32)"
 installZMQ() {
     echoProgress "MISP ZeroMQ" "installing" "Installing MISP ZMQ python requirements"
     cd ../src/
+    sudo apt-get update && sudo apt-get install python3-venv
     python3 -m venv venv && source venv/bin/activate && pip install -r requirements.txt
+    echoProgress "MISP ZeroMQ" "done" "\n"
 }
 
 changeLogFormat() {
+    echoProgress "Apache2" "configure" "Configuring apache2 to use time to serve request\n"
     echo "Make sure the \`combined\` log entry is set to the following:"
+    echo ''
+    echo 'LogFormat "%h %l %u %t \"%r\" %>s %O \"%{Referer}i\" \"%{User-Agent}i\" %D" combined'
     echo ''
     echo 'Configuration file should be located here:'
     echo '/etc/apache2/apache2.conf'
     echo ''
     echo 'Make sure to restart apache2 afterward:'
     echo 'service apache2 restart'
+    echoProgress "Apache2" "done" "\n"
 }
 
 enableMySQLPerfMonitoring() {
@@ -36,6 +42,7 @@ enableMySQLPerfMonitoring() {
     echo ''
     echo 'Make sure to restart apache2 afterward:'
     echo 'service mysql restart'
+    echoProgress "MySQL" "done" "\n"
 }
 
 createMonitoringUser() {
@@ -45,6 +52,7 @@ createMonitoringUser() {
     echo "CREATE USER 'monitoring'@'localhost' IDENTIFIED BY '$DBPASSWORD_MONITORING_USER';"
     echo "GRANT SELECT ON *.* TO 'monitoring'@'localhost';"
     echo "FLUSH PRIVILEGES;"
+    echoProgress "MySQL" "done" "\n"
 }
 
 installTelegraf() {
@@ -53,13 +61,15 @@ installTelegraf() {
     echo '393e8779c89ac8d958f81f942f9ad7fb82a25e133faddaf92e15b16e6ac9ce4c influxdata-archive_compat.key' | sha256sum -c && cat influxdata-archive_compat.key | gpg --dearmor | sudo tee /etc/apt/trusted.gpg.d/influxdata-archive_compat.gpg > /dev/null
     echo 'deb [signed-by=/etc/apt/trusted.gpg.d/influxdata-archive_compat.gpg] https://repos.influxdata.com/debian stable main' | sudo tee /etc/apt/sources.list.d/influxdata.list
     sudo apt-get update && sudo apt-get install telegraf
+    echoProgress "Telegraf" "done" "\n"
 }
 
 genTelegrafConfig() {
-    local echoProgress "Telegraf" "configuring" "Configuring Telegraf config"
+    echoProgress "Telegraf" "configuring" "Configuring Telegraf config"
     local name=$(get_name)
     sed "s/{{\s*instance_name\s*}}/$name/g" telegraf.conf.template > telegraf.conf
     sed "s/{{\s*db_password_monitoring_user\s*}}/$DBPASSWORD_MONITORING_USER/g" telegraf.conf.template > telegraf.conf
+    echoProgress "Telegraf" "done" "\n"
 }
 
 waitForNextStep() {
