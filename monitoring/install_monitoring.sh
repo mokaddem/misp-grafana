@@ -11,10 +11,13 @@ DBPASSWORD_MONITORING_USER="$(openssl rand -hex 32)"
 
 installZMQ() {
     echoProgress "MISP ZeroMQ" "installing" "Installing MISP ZMQ python requirements"
-    cd ../src/
+    pushd ..
+    pushd src/
     sudo apt-get update && sudo apt-get install python3-venv
     python3 -m venv venv && source venv/bin/activate && pip install -r requirements.txt
     echoProgress "MISP ZeroMQ" "done" "\n"
+    popd
+    popd
 }
 
 changeLogFormat() {
@@ -75,12 +78,17 @@ genTelegrafConfig() {
 
 waitForNextStep() {
     local message="$1"
+    local return=$2
     echo -e " >> Next step: $BYellow$message$Color_Off"
 
     while true; do
-        read -p "Do you want to continue? (y): " y
+        read -p "Do you want to continue (y) or do you want to skip (s)?: " y
         case $y in
             [Yy]* ) 
+            eval $return="y"
+                break;;
+            [Ss]* ) 
+            eval $return="s"
                 break;;
             * )
                 echo "Please enter y to continue.";;
@@ -105,27 +113,41 @@ echo ""
 echo "This utility will guide you on installing and configuring the monitoring tools."
 echo "Please make sure to have another shell accessible as you'll be required to paste some commands"
 echo ""
-waitForNextStep "ZeroMQ - Installation"
 
 # ZeroMQ
-installZMQ
-waitForNextStep "Apache2 - LogFormat"
+waitForNextStep "ZeroMQ - Installation" userinput
+if [ "$userinput" == "y" ]
+    then installZMQ
+fi
 
 # Apache2
-changeLogFormat
-waitForNextStep "MySQL - Performance Schema"
+waitForNextStep "Apache2 - LogFormat" userinput
+if [ "$userinput" == "y" ]
+    then changeLogFormat
+fi
 
 # MySQL
-enableMySQLPerfMonitoring
-waitForNextStep "MySQL - Monitoring User"
-createMonitoringUser
-waitForNextStep "Telegraf - Configuration"
+waitForNextStep "MySQL - Performance Schema" userinput
+if [ "$userinput" == "y" ]
+    then enableMySQLPerfMonitoring
+fi
+waitForNextStep "MySQL - Monitoring User" userinput
+if [ "$userinput" == "y" ]
+    then createMonitoringUser
+fi
+
 
 # Telgraf
 ## Generate telegraf configuration
-genTelegrafConfig
-waitForNextStep "Telegraf - Installation"
+waitForNextStep "Telegraf - Configuration" userinput
+if [ "$userinput" == "y" ]
+    then genTelegrafConfig
+fi
 
 ## Install telegraf
-installTelegraf
+waitForNextStep "Telegraf - Installation" userinput
+if [ "$userinput" == "y" ]
+    then installTelegraf
+fi
+
 echoProgress "Installation" "done" "\n"
