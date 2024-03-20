@@ -54,7 +54,14 @@ def push_metric(api, instance, topic, m, recv_ts):
                 "email": str(m["Log"].get("email", "")),
                 "user_id": str(m["Log"].get("user_id", "")),
                 "org": str(m["Log"].get("org", "")),
-                "model_id": str(m["Log"].get("model_id", ""))
+                "model_id": str(m["Log"].get("model_id", "")),
+                "controller": str(m["Log"].get("controller", "")),
+                "action": str(m["Log"].get("action", "")),
+                "url": str(m["Log"].get("url", "")),
+                "response_code": str(m["Log"].get("response_code", "")),
+                "memory_usage": str(m["Log"].get("memory_usage", "")),
+                "query_count": str(m["Log"].get("query_count", "")),
+                "duration": str(m["Log"].get("duration", "")),
             },
         }
 
