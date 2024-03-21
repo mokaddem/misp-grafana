@@ -115,7 +115,7 @@ Description=MISP instance monitoring service
 After=mysqld.service
 
 [Service]
-Type=simple
+Type=forking
 Restart=always
 RestartSec=3
 User=root
@@ -223,7 +223,7 @@ fi
 
 # Reboot safe
 ## Configure a service for both ZeroMQ and Telegraf
-waitForNextStep "Reboot safe - Setup" userinput
+waitForNextStep "Reboot safe - Service setup and start" userinput
 if [ "$userinput" == "y" ]
     then setupRebootSafe
 fi

@@ -18,5 +18,5 @@ fi
 
 screen -dmS "$screenname"
 sleep 0.5
-screen -S "$screenname" -X screen -t "telegraf" bash -c "telegraf --config telegraf.conf"
-screen -S "$screenname" -X screen -t "misp zeromq" bash -c "python3 push_zmq_to_influxdb.py -id $name"
+screen -S "$screenname" -X screen -t "telegraf" bash -c "telegraf --config telegraf.conf; read x"
+screen -S "$screenname" -X screen -t "misp zeromq" bash -c "python3 push_zmq_to_influxdb.py -id $name; read x"
