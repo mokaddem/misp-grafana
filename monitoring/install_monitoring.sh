@@ -121,7 +121,7 @@ RestartSec=3
 User=root
 WorkingDirectory=$PWD
 ExecStart=bash start_monitoring.sh
-Environment="instancename=$INSTANCE_NAME"
+Environment=\"instancename=$INSTANCE_NAME\"
 
 [Install]
 WantedBy=multi-user.target
