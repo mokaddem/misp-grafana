@@ -83,28 +83,28 @@ installTelegraf() {
 genTelegrafConfig() {
     echoProgress "Telegraf" "configuring" "Configuring Telegraf config"
     sed "s/{{\s*instance_name\s*}}/$INSTANCE_NAME/g" telegraf.conf.template > telegraf.conf
-    sed "s/{{\s*db_password_monitoring_user\s*}}/$DBPASSWORD_MONITORING_USER/g" telegraf.conf.template > telegraf.conf
+    sed "s/{{\s*db_password_monitoring_user\s*}}/$DBPASSWORD_MONITORING_USER/g" telegraf.conf > telegraf.conf
     echoProgress "Telegraf" "done" "\n"
 }
 
 configureMISP() {
     echoProgress "MISP" "configuring" "Configuring to fully benefit from the monitoring"
-    echo "/var/www/MISP/app/Command/cake Admin setSetting MISP.log_paranoid 1"
-    echo "/var/www/MISP/app/Command/cake Admin setSetting MISP.log_paranoid_skip_db 1"
-    echo "/var/www/MISP/app/Command/cake Admin setSetting MISP.log_user_ips 1"
-    echo "/var/www/MISP/app/Command/cake Admin setSetting MISP.log_user_ips_authkeys 1"
-    echo "/var/www/MISP/app/Command/cake Admin setSetting MISP.log_auth 1"
-    echo "/var/www/MISP/app/Command/cake Admin setSetting Plugin.ZeroMQ_enable 1"
-    echo "/var/www/MISP/app/Command/cake Admin setSetting Plugin.ZeroMQ_event_notifications_enable 1"
-    echo "/var/www/MISP/app/Command/cake Admin setSetting Plugin.ZeroMQ_object_notifications_enable 1"
-    echo "/var/www/MISP/app/Command/cake Admin setSetting Plugin.ZeroMQ_object_reference_notifications_enable 1"
-    echo "/var/www/MISP/app/Command/cake Admin setSetting Plugin.ZeroMQ_attribute_notifications_enable 1"
-    echo "/var/www/MISP/app/Command/cake Admin setSetting Plugin.ZeroMQ_tag_notifications_enable 1"
-    echo "/var/www/MISP/app/Command/cake Admin setSetting Plugin.ZeroMQ_sighting_notifications_enable 1"
-    echo "/var/www/MISP/app/Command/cake Admin setSetting Plugin.ZeroMQ_user_notifications_enable 1"
-    echo "/var/www/MISP/app/Command/cake Admin setSetting Plugin.ZeroMQ_organisation_notifications_enable 1"
-    echo "/var/www/MISP/app/Command/cake Admin setSetting Plugin.ZeroMQ_audit_notifications_enable 1"
-    echo "/var/www/MISP/app/Command/cake Admin setSetting Plugin.ZeroMQ_warninglist_notifications_enable 1"
+    echo "sudo -u www-data /var/www/MISP/app/Console/cake Admin setSetting MISP.log_paranoid 1 --force"
+    echo "sudo -u www-data /var/www/MISP/app/Console/cake Admin setSetting MISP.log_paranoid_skip_db 1"
+    echo "sudo -u www-data /var/www/MISP/app/Console/cake Admin setSetting MISP.log_user_ips 1"
+    echo "sudo -u www-data /var/www/MISP/app/Console/cake Admin setSetting MISP.log_user_ips_authkeys 1"
+    echo "sudo -u www-data /var/www/MISP/app/Console/cake Admin setSetting MISP.log_auth 1"
+    echo "sudo -u www-data /var/www/MISP/app/Console/cake Admin setSetting Plugin.ZeroMQ_enable 1"
+    echo "sudo -u www-data /var/www/MISP/app/Console/cake Admin setSetting Plugin.ZeroMQ_event_notifications_enable 1"
+    echo "sudo -u www-data /var/www/MISP/app/Console/cake Admin setSetting Plugin.ZeroMQ_object_notifications_enable 1"
+    echo "sudo -u www-data /var/www/MISP/app/Console/cake Admin setSetting Plugin.ZeroMQ_object_reference_notifications_enable 1"
+    echo "sudo -u www-data /var/www/MISP/app/Console/cake Admin setSetting Plugin.ZeroMQ_attribute_notifications_enable 1"
+    echo "sudo -u www-data /var/www/MISP/app/Console/cake Admin setSetting Plugin.ZeroMQ_tag_notifications_enable 1"
+    echo "sudo -u www-data /var/www/MISP/app/Console/cake Admin setSetting Plugin.ZeroMQ_sighting_notifications_enable 1"
+    echo "sudo -u www-data /var/www/MISP/app/Console/cake Admin setSetting Plugin.ZeroMQ_user_notifications_enable 1"
+    echo "sudo -u www-data /var/www/MISP/app/Console/cake Admin setSetting Plugin.ZeroMQ_organisation_notifications_enable 1"
+    echo "sudo -u www-data /var/www/MISP/app/Console/cake Admin setSetting Plugin.ZeroMQ_audit_notifications_enable 1"
+    echo "sudo -u www-data /var/www/MISP/app/Console/cake Admin setSetting Plugin.ZeroMQ_warninglist_notifications_enable 1"
     echoProgress "MISP" "done" "\n"
 }
 
@@ -129,6 +129,9 @@ WantedBy=multi-user.target
 
 systemctl enable misp_monitoring
 systemctl start misp_monitoring
+
+echo -e "Create and enabled misp_monitoring service."
+echo -e "Telgraf and ZMQ subscribers are running in the \`MISP monitoring InfluxDB\` gnu-screen"
 }
 
 waitForNextStep() {
