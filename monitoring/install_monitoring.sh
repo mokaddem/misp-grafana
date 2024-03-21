@@ -6,6 +6,7 @@ Color_Off='\033[0m'       # Text Reset
 BCyan='\033[1;36m'        # Bold Cyan
 BGreen='\033[1;32m'       # Bold Green
 BYellow='\033[1;33m'       # Bold Yellow
+BRed='\033[1;31m'       # Bold Red
 
 DBPASSWORD_MONITORING_USER="$(openssl rand -hex 32)"
 
@@ -162,10 +163,12 @@ getInstanceName() {
 }
 
 
-echo ""
-echo "This utility will guide you on installing and configuring the monitoring tools."
-echo "Please make sure to have another shell accessible as you'll be required to paste some commands"
-echo ""
+echo -e ""
+echo -e "This utility will guide you on installing and configuring the monitoring tools."
+echo -e ""
+echo -e "Please make sure to have $BRedanother shell accessible$Color_Off as you'll be required to paste some commands"
+echo -e ""
+echo -e ""
 
 # ZeroMQ
 waitForNextStep "ZeroMQ - Installation" userinput
