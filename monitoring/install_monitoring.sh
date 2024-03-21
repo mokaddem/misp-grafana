@@ -127,11 +127,11 @@ Environment=\"instancename=$INSTANCE_NAME\"
 WantedBy=multi-user.target
 " > /etc/systemd/system/misp_monitoring.service
 
-systemctl enable misp_monitoring
-systemctl start misp_monitoring
+    systemctl enable misp_monitoring
 
-echo -e "Create and enabled misp_monitoring service."
-echo -e "Telgraf and ZMQ subscribers are running in the \`MISP monitoring InfluxDB\` gnu-screen"
+    echo -e "Created and enabled misp_monitoring service."
+    echo -e "Telgraf and ZMQ subscribers are running in the \`MISP monitoring InfluxDB\` gnu-screen"
+    echo -e "Make sure to double check the path of exectuble for the \`start_monitoring.sh\` script that will be run by the monitoring service"
 }
 
 waitForNextStep() {
@@ -232,3 +232,8 @@ if [ "$userinput" == "y" ]
 fi
 
 echoProgress "Installation" "done" "\n"
+
+waitForNextStep "Monitoring - Do you want to start the monitoring service ?" userinput
+if [ "$userinput" == "y" ]
+    then systemctl start misp_monitoring
+fi
