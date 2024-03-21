@@ -166,7 +166,7 @@ getInstanceName() {
 echo -e ""
 echo -e "This utility will guide you on installing and configuring the monitoring tools."
 echo -e ""
-echo -e "Please make sure to have $BRedanother shell accessible$Color_Off as you'll be required to paste some commands"
+echo -e "Please make sure to have $BRed another shell accessible$Color_Off as you'll be required to paste some commands"
 echo -e ""
 echo -e ""
 
