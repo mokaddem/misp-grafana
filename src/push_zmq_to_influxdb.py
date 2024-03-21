@@ -54,14 +54,32 @@ def push_metric(api, instance, topic, m, recv_ts):
                 "email": str(m["Log"].get("email", "")),
                 "user_id": str(m["Log"].get("user_id", "")),
                 "org": str(m["Log"].get("org", "")),
-                "model_id": str(m["Log"].get("model_id", "")),
-                "controller": str(m["Log"].get("controller", "")),
-                "action": str(m["Log"].get("action", "")),
-                "url": str(m["Log"].get("url", "")),
-                "response_code": str(m["Log"].get("response_code", "")),
-                "memory_usage": str(m["Log"].get("memory_usage", "")),
-                "query_count": str(m["Log"].get("query_count", "")),
-                "duration": str(m["Log"].get("duration", "")),
+                "model_id": str(m["Log"].get("model_id", ""))
+            },
+        }
+
+        api.write(bucket=os.getenv("INFLUXDB_BUCKET"), record=r)
+
+    # log_paranoid and log_paranoid_skip_dn is enabled
+    if topic == "misp_json_audit" and "url" in m:
+        logging.info("Log pushed to InfluxDB")
+        r = {
+            "measurement": "audit",
+            "tags": {
+                "instance": instance,
+                "user_id": str(m.get("user_id", "")),
+                "org_id": str(m.get("org_id", "")),
+            },
+            "fields": {
+                "action": str(m.get("action", "")),
+                "controller": str(m.get("controller", "")),
+                "duration": str(m.get("duration", "")),
+                "ip": m.get("ip", ""),
+                "memory_usage": str(m.get("memory_usage", "")),
+                "query_count": str(m.get("query_count", "")),
+                "response_code": str(m.get("response_code", "")),
+                "url": str(m.get("url", "")),
+                "user_agent": str(m.get("user_agent", "")),
             },
         }
 
