@@ -1,4 +1,5 @@
 #!/bin/bash
+set -e
 
 name="$instancename"
 if [ -z "$name" ]; then
@@ -11,7 +12,7 @@ screenname="MISP monitoring InfluxDB"
 gnuscreenpid=$(screen -ls | grep "$screenname" | cut -f2 | cut -d'.' -f1)
 
 if $gnuscreenpid; then
-    screen -X -S $gnuscreenpid quit
+    screen -X -S "$gnuscreenpid" quit
     sleep 1
 fi
 
