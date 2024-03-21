@@ -11,12 +11,12 @@ fi
 screenname="MISP monitoring InfluxDB"
 gnuscreenpid=$(screen -ls | grep "$screenname" | cut -f2 | cut -d'.' -f1)
 
-if $gnuscreenpid; then
+if [ -n "$gnuscreenpid" ]; then
     screen -X -S "$gnuscreenpid" quit
     sleep 1
 fi
 
 screen -dmS "$screenname"
-sleep 0.1
-screen -S "MISP monitoring InfluxDB" -X screen -t "telegraf" bash -c "telegraf --config telegraf.conf"
-screen -S "MISP monitoring InfluxDB" -X screen -t "misp zeromq" bash -c "python3 push_zmq_to_influxdb.py -id $name"
+sleep 0.5
+screen -S "$screenname" -X screen -t "telegraf" bash -c "telegraf --config telegraf.conf"
+screen -S "$screenname" -X screen -t "misp zeromq" bash -c "python3 push_zmq_to_influxdb.py -id $name"
