@@ -20,6 +20,16 @@ installZMQ() {
     popd
 }
 
+configureZMQ() {
+    echoProgress "MISP ZeroMQ" "configuring" "Configuring MISP ZMQ python"
+    pushd ..
+    pushd src/
+    vim .env
+    echoProgress "MISP ZeroMQ" "done" "\n"
+    popd
+    popd
+}
+
 changeLogFormat() {
     echoProgress "Apache2" "configure" "Configuring apache2 to use time to serve request\n"
     echo "Make sure the \`combined\` log entry is set to the following:"
@@ -76,6 +86,49 @@ genTelegrafConfig() {
     echoProgress "Telegraf" "done" "\n"
 }
 
+configureMISP() {
+    echoProgress "MISP" "configuring" "Configuring to fully benefit from the monitoring"
+    echo "/var/www/MISP/app/Command/cake Admin setSetting MISP.log_paranoid 1"
+    echo "/var/www/MISP/app/Command/cake Admin setSetting MISP.log_paranoid_skip_db 1"
+    echo "/var/www/MISP/app/Command/cake Admin setSetting MISP.log_user_ips 1"
+    echo "/var/www/MISP/app/Command/cake Admin setSetting MISP.log_user_ips_authkeys 1"
+    echo "/var/www/MISP/app/Command/cake Admin setSetting MISP.log_auth 1"
+    echo "/var/www/MISP/app/Command/cake Admin setSetting Plugin.ZeroMQ_enable 1"
+    echo "/var/www/MISP/app/Command/cake Admin setSetting Plugin.ZeroMQ_event_notifications_enable 1"
+    echo "/var/www/MISP/app/Command/cake Admin setSetting Plugin.ZeroMQ_object_notifications_enable 1"
+    echo "/var/www/MISP/app/Command/cake Admin setSetting Plugin.ZeroMQ_object_reference_notifications_enable 1"
+    echo "/var/www/MISP/app/Command/cake Admin setSetting Plugin.ZeroMQ_attribute_notifications_enable 1"
+    echo "/var/www/MISP/app/Command/cake Admin setSetting Plugin.ZeroMQ_tag_notifications_enable 1"
+    echo "/var/www/MISP/app/Command/cake Admin setSetting Plugin.ZeroMQ_sighting_notifications_enable 1"
+    echo "/var/www/MISP/app/Command/cake Admin setSetting Plugin.ZeroMQ_user_notifications_enable 1"
+    echo "/var/www/MISP/app/Command/cake Admin setSetting Plugin.ZeroMQ_organisation_notifications_enable 1"
+    echo "/var/www/MISP/app/Command/cake Admin setSetting Plugin.ZeroMQ_audit_notifications_enable 1"
+    echo "/var/www/MISP/app/Command/cake Admin setSetting Plugin.ZeroMQ_warninglist_notifications_enable 1"
+    echoProgress "MISP" "done" "\n"
+}
+
+setupRebootSafe() {
+    echo "
+[Unit]
+Description=MISP instance monitoring service
+After=mysqld.service
+
+[Service]
+Type=simple
+Restart=always
+RestartSec=3
+User=root
+WorkingDirectory=$PWD
+ExecStart=bash start_monitoring.sh
+
+[Install]
+WantedBy=multi-user.target
+" > /etc/systemd/system/misp_monitoring.service
+
+systemctl enable misp_monitoring
+systemctl start misp_monitoring
+}
+
 waitForNextStep() {
     local message="$1"
     local return=$2
@@ -119,6 +172,10 @@ waitForNextStep "ZeroMQ - Installation" userinput
 if [ "$userinput" == "y" ]
     then installZMQ
 fi
+waitForNextStep "ZeroMQ - Configuration" userinput
+if [ "$userinput" == "y" ]
+    then configureZMQ
+fi
 
 # Apache2
 waitForNextStep "Apache2 - LogFormat" userinput
@@ -151,3 +208,17 @@ if [ "$userinput" == "y" ]
 fi
 
 echoProgress "Installation" "done" "\n"
+
+# MISP
+## Configure MISP
+waitForNextStep "MISP - Configuration" userinput
+if [ "$userinput" == "y" ]
+    then configureMISP
+fi
+
+# Reboot safe
+## Configure a service for both ZeroMQ and Telegraf
+waitForNextStep "Reboot safe - Setup" userinput
+if [ "$userinput" == "y" ]
+    then setupRebootSafe
+fi
