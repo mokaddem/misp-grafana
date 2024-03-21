@@ -9,6 +9,7 @@ BYellow='\033[1;33m'       # Bold Yellow
 BRed='\033[1;31m'       # Bold Red
 
 DBPASSWORD_MONITORING_USER="$(openssl rand -hex 32)"
+INSTANCE_NAME=""
 
 installZMQ() {
     echoProgress "MISP ZeroMQ" "installing" "Installing MISP ZMQ python requirements"
@@ -81,8 +82,7 @@ installTelegraf() {
 
 genTelegrafConfig() {
     echoProgress "Telegraf" "configuring" "Configuring Telegraf config"
-    local name=$(getInstanceName)
-    sed "s/{{\s*instance_name\s*}}/$name/g" telegraf.conf.template > telegraf.conf
+    sed "s/{{\s*instance_name\s*}}/$INSTANCE_NAME/g" telegraf.conf.template > telegraf.conf
     sed "s/{{\s*db_password_monitoring_user\s*}}/$DBPASSWORD_MONITORING_USER/g" telegraf.conf.template > telegraf.conf
     echoProgress "Telegraf" "done" "\n"
 }
@@ -121,6 +121,7 @@ RestartSec=3
 User=root
 WorkingDirectory=$PWD
 ExecStart=bash start_monitoring.sh
+Environment="instancename=$INSTANCE_NAME"
 
 [Install]
 WantedBy=multi-user.target
@@ -170,6 +171,9 @@ echo -e "Please make sure to have $BRed another shell accessible$Color_Off as yo
 echo -e ""
 echo -e ""
 
+# Get instance name
+INSTANCE_NAME=$(getInstanceName)
+
 # ZeroMQ
 waitForNextStep "ZeroMQ - Installation" userinput
 if [ "$userinput" == "y" ]
@@ -210,8 +214,6 @@ if [ "$userinput" == "y" ]
     then installTelegraf
 fi
 
-echoProgress "Installation" "done" "\n"
-
 # MISP
 ## Configure MISP
 waitForNextStep "MISP - Configuration" userinput
@@ -225,3 +227,5 @@ waitForNextStep "Reboot safe - Setup" userinput
 if [ "$userinput" == "y" ]
     then setupRebootSafe
 fi
+
+echoProgress "Installation" "done" "\n"
